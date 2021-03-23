@@ -1,7 +1,7 @@
 {
   "build_url": "https://github.com/blab/ncov-wa-build/",
   "maintainers": [
-    {"name": "Cassia Wagner", "url": "https://github.com/cassiawag"}
+    {"name": "Trevor Bedford", "url": "https://bedford.io"}
   ],
   "colorings": [
     {

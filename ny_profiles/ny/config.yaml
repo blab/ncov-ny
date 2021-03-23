@@ -1,6 +1,6 @@
 configfile:
-  - wa_profiles/wa/builds.yaml
-  - wa_profiles/wa/input.yaml
+  - ny_profiles/ny/builds.yaml
+  - ny_profiles/ny/input.yaml
 
 cores: 8
 keep-going: True
