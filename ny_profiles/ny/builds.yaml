@@ -36,8 +36,13 @@ builds:
   ny_6m:
     title: "NY-focused SARS-CoV-2 genomic analysis"
     division: New York
-    n_sequences: 2000
     subsampling_scheme: time-window
+    n_sequences_ny_focus_recent: 1000
+    n_sequences_usa_context_recent: 200
+    n_sequences_global_context_recent: 200
+    n_sequences_ny_focus_early: 500
+    n_sequences_usa_context_early: 100
+    n_sequences_global_context_early: 100
 
 # Define subsampling scheme for builds. This scheme should include as much
 # local diversity for a given division as possible and contextual samples from
@@ -45,53 +50,42 @@ builds:
 subsampling:
   time-window:
     # Subsampling for a given time window
-    local-focus:
-      # Evenly sample from earliest_date to latest_date for the current division.
+    ny-focus-recent:
+      # Evenly sample from earliest_date to latest_date for New York, targeting n_sequences
       group_by: "division"
-      max_sequences: "{n_sequences}"
+      max_sequences: "{n_sequences_ny_focus_recent}"
       max_date: --max-date {latest_date}
       min_date: --min-date {earliest_date}
       query: --query "(country == 'USA' & division == '{division}' & purpose_of_sequencing != 'S dropout')"
-    usa-context:
-      # Sampling in the time window from other divisions in the USA, prioritizing
-      # samples genetically similar to the current division's sequences.
+    usa-context-recent:
+      # Evenly sample from earliest_date to latest_date for USA, targeting n_sequences
       group_by: "year month"
-      max_sequences: "{n_usa}"
+      max_sequences: "{n_sequences_usa_context_recent}"
       max_date: --max-date {latest_date}
       min_date: --min-date {earliest_date}
       query: --query "(country == 'USA' & division != '{division}' & purpose_of_sequencing != 'S dropout')"
-      priorities:
-        type: proximity
-        focus: local-focus
-    global-context:
-      # Even sampling in the time window from across the world excluding the USA,
-      # prioritizing samples genetically similar to current division's sequences.
+    global-context-recent:
+      # Evenly sample from earliest_date to latest_date for world, targeting n_sequences
       group_by: "region year month"
-      max_sequences: "{n_global}"
+      max_sequences: "{n_sequences_global_context_recent}"
       max_date: --max-date {latest_date}
       min_date: --min-date {earliest_date}
       query: --query "(country != 'USA' & purpose_of_sequencing != 'S dropout')"
-      priorities:
-        type: proximity
-        focus: local-focus
-    local-context-early:
-      # Even sampling before the time window for the current division,
-      # prioritizing samples genetically similar to divison's sequences
-      # within the time window.
+    ny-focus-early:
+      # Evenly sample up to earliest_date for New York, targeting n_sequences
       group_by: "year month"
-      max_sequences: "{n_early}"
+      max_sequences: "{n_sequences_ny_focus_early}"
       max_date: --max-date {earliest_date}
       query: --query "(country == 'USA' & division == '{division}' & purpose_of_sequencing != 'S dropout')"
-      priorities:
-        type: proximity
-        focus: local-focus
-    global-context-early:
-      # Even sampling before the time window from the world, excluding USA,
-      # prioritizing samples genetically similar to the division.
+    usa-context-early:
+      # Evenly sample up to earliest_date for USA, targeting n_sequences
       group_by: "region year month"
-      max_sequences: "{n_global_early}"
+      max_sequences: "{n_sequences_usa_context_early}"
       max_date: --max-date {earliest_date}
-      query: --query "(division != '{division}' & purpose_of_sequencing != 'S dropout')"
-      priorities:
-        type: proximity
-        focus: local-context-early
+      query: --query "(country == 'USA' & division != '{division}' & purpose_of_sequencing != 'S dropout')"
+    global-context-early:
+      # Evenly sample up to earliest_date for world, targeting n_sequences
+      group_by: "region year month"
+      max_sequences: "{n_sequences_global_context_early}"
+      max_date: --max-date {earliest_date}
+      query: --query "(country != 'USA' & purpose_of_sequencing != 'S dropout')"
